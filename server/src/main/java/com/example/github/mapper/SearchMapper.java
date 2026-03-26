@@ -13,4 +13,6 @@ public interface SearchMapper {
 	int upsert(String name);
 	
 	int delete(Long id);
+	
+	int togglePinned(Long id);
 }

@@ -19,11 +19,17 @@ interface SearchLog {
   id: number;
   name: string;
   created_at: Date;
+  pinned: boolean;
 }
 
 
-export function Repository() {
-  const [search, setSearch] = useState("" as string)
+
+
+export function Repository({search, setSearch}:{
+    search: string;
+    setSearch: React.Dispatch<React.SetStateAction<string>>;
+}) {
+  
   const [searchData, setSearchData] = useState(""as string)
   const [searchList, setSearchList] = useState([] as RepoItem[])
   const [isLoading, setIsLoading] = useState(false)
@@ -55,6 +61,15 @@ export function Repository() {
     fetchSearchLog()
   },[searchList])
 
+
+  useEffect(()=>{
+    if(search==null || search=="")
+        return;
+
+    fn_search(search);
+
+  },[search])
+
   return (
     <>
       <div className='board_wrapper'>
@@ -65,8 +80,13 @@ export function Repository() {
           <div className='board_nav_header'>
             <input type="text" value={search} onChange={(e)=>setSearch(e.target.value)}/>
             <button onClick={()=>fn_search(search)}>검색</button>
+            <div className='search_logs pinned'>
+              {searchLog.filter(v=>v.pinned).map(v=>(
+                <span key={v.id} className='search_logs_item' onClick={()=>fn_search(v.name)}>{v.pinned && "● "}{v.name}</span>
+              ))}
+            </div>
             <div className='search_logs'>
-              {searchLog.map(v=>(
+              {searchLog.filter(v=>!v.pinned).map(v=>(
                 <span key={v.id} className='search_logs_item' onClick={()=>fn_search(v.name)}>{v.name}</span>
               ))}
             </div>

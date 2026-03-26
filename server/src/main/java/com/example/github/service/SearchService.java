@@ -20,4 +20,8 @@ public class SearchService {
 	public int delete(Long id) {
 		return searchMapper.delete(id);
 	}
+	
+	public int togglePinned(Long id) {
+		return searchMapper.togglePinned(id);
+	}
 }

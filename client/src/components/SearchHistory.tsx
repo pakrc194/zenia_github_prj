@@ -8,7 +8,10 @@ interface SearchLog {
   pinned: boolean;
 }
 
-export default function SearchHistory() {
+export default function SearchHistory({setMenu, setSearch}: {
+    setMenu: React.Dispatch<React.SetStateAction<string>>;
+    setSearch: React.Dispatch<React.SetStateAction<string>>;
+}) {
     const[logList, setLogList] = useState([] as SearchLog[])
 
     useEffect(()=>{
@@ -28,7 +31,25 @@ export default function SearchHistory() {
         fetchDelete()
         setLogList(prev=>prev.filter(v=>v.id!=id))
     }   
-
+    const btn_pinned = (id: number) => {
+        console.log(id)
+        const fetchPinned = async () => {
+            await api.patch(`/search/${id}`)
+        }
+        fetchPinned()
+        setLogList(prev => 
+        prev.map(item => 
+            item.id === id 
+            ? { ...item, pinned: !item.pinned }
+            : item
+        )
+        );
+    }
+    const btn_search = (search: string) => {
+        setSearch(search)
+        setMenu("repository")
+    }
+    
     return (
         <>
         <h1>Search History</h1>
@@ -37,8 +58,8 @@ export default function SearchHistory() {
                 <div key={k} style={{textAlign:"left"}}>
                     <hr/>
                     <span style={{padding: "10px", display:"flex", flexDirection:"row", gap:"10px"}}>
-                        <span style={{cursor: "pointer"}}>{v.pinned ?"●":"○"}</span>
-                        <h2>{v.name}</h2>
+                        <span style={{cursor: "pointer"}} onClick={()=>btn_pinned(v.id)}>{v.pinned ?"●":"○"}</span>
+                        <h2 style={{cursor: "pointer"}} onClick={()=>btn_search(v.name)}>{v.name}</h2>
                         <button onClick={()=>btn_delete(v.id)}>x</button>
                     </span>
                     <div style={{textAlign: "right"}}>{new Date(v.created_at).toLocaleString()}</div>
