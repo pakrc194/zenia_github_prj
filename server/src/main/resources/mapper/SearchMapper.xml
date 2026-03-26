@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.github.mapper.SearchMapper">
+
+    <select id="findByLimit" resultType="com.example.github.dto.response.SearchLogDto" parameterType="int">
+        SELECT id, name, created_at, pinned
+        from search order by created_at desc
+        <if test='limit != 0'> 
+        limit #{limit};
+        </if>
+    </select>
+
+    <insert id="upsert" parameterType="String">
+        insert into search(name, created_at)
+        values (#{name}, now())
+        ON DUPLICATE KEY UPDATE
+        created_at = NOW()
+    </insert>
+    
+    <delete id="delete" parameterType="Long">
+    	delete from search where id = #{id}
+    </delete>
+</mapper>
