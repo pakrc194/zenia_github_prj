@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import './App.css'
 import { Repository } from './components/Repository.tsx'
 import SearchHistory from './components/SearchHistory.tsx'
-import Faviorate from './components/Faviorate.tsx'
+import Favorite from './components/Favorite.tsx'
 
 
 
@@ -17,7 +17,7 @@ function App() {
     </div>
     {menu==="repository" && <Repository search={search} setSearch={setSearch}/>}
     {menu==="history" && <SearchHistory setSearch={setSearch} setMenu={setMenu}/>}
-    {menu==="faviorate" && <Faviorate setSearch={setSearch} setMenu={setMenu}/>}
+    {menu==="faviorate" && <Favorite setMenu={setMenu}/>}
   </>
 }
 

@@ -70,6 +70,12 @@ export function Repository({search, setSearch}:{
 
   },[search])
 
+  const fn_favorite = async (item: RepoItem) => {
+    console.log(item)
+    await api.post("/favorite", item)
+  }
+
+
   return (
     <>
       <div className='board_wrapper'>
@@ -98,12 +104,20 @@ export function Repository({search, setSearch}:{
         <div className="board_section">
           <div className='section_result'>
             {searchList.map((v,k)=>(
-              <div key={k} className='section_result_item' style={{textAlign : 'left'}}>
-                <hr/>
-                <span>{`[${v.name}]`}</span>
-                <div><h2><a href={v.html_url} target="_blank" rel="noopener noreferrer">{v.full_name}</a>{` ☆(${v.stargazers_count})`}</h2></div>
-                <div><h4>{v.description}</h4></div>
-                <span></span>
+              <div key={k} className='section_result_wrapper' style={{textAlign : 'left'}}>
+                <div className='line'>
+                    <hr/>
+                </div>
+                <div className='section_result_item'>
+                    <div className='section_result_faviorate'>
+                        <span style={{cursor:"pointer"}} onClick={()=>fn_favorite(v)}>☆</span>
+                    </div>
+                    <div className='section_result_info'>
+                        <span>{`[${v.name}]`}</span>
+                        <div><h2><a href={v.html_url} target="_blank" rel="noopener noreferrer">{v.full_name}</a>{` ☆(${v.stargazers_count})`}</h2></div>
+                        <div><h4>{v.description}</h4></div>
+                    </div>
+                </div>
               </div>
             ))}
           </div>

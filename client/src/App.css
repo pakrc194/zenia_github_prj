@@ -22,3 +22,15 @@
   display: block;
   cursor: pointer;
 }
+
+.section_result_item {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+.section_result_faviorate {
+  padding: 0 15px;
+  font-size: 1.5rem;
+  line-height: 1.5rem;
+  height: 3rem;
+}

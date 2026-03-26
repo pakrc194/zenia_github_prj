@@ -38,11 +38,11 @@ export default function SearchHistory({setMenu, setSearch}: {
         }
         fetchPinned()
         setLogList(prev => 
-        prev.map(item => 
-            item.id === id 
-            ? { ...item, pinned: !item.pinned }
-            : item
-        )
+            prev.map(item => 
+                item.id === id 
+                ? { ...item, pinned: !item.pinned }
+                : item
+            )
         );
     }
     const btn_search = (search: string) => {
