@@ -1,4 +1,4 @@
-# bust: 2025-03-27-003
+# bust: 2026-03-27-final
 FROM maven:3.9-eclipse-temurin-17 AS build
 WORKDIR /app
 
@@ -7,11 +7,10 @@ RUN mvn dependency:go-offline -B
 
 COPY src ./src
 RUN mvn package -DskipTests
-RUN ls -la target/
 
-# bust: 2025-03-27-003
-FROM eclipse-temurin:17-jre
+# bust: 2026-03-27-final
+FROM eclipse-temurin:17-jre AS runtime
 WORKDIR /app
 COPY --from=build /app/target/*.jar app.jar
 EXPOSE 8080
-ENTRYPOINT ["java", "-jar", "/app.jar"]
+ENTRYPOINT ["java", "-jar", "/app/app.jar"]
