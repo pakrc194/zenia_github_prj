@@ -24,8 +24,8 @@ public class FavoriteService {
 		
 	}
 	
-	public int delete(Long id) {
-		return favoriteMapper.delete(id);
+	public int delete(String fullName) {
+		return favoriteMapper.delete(fullName);
 	}
 	
 }

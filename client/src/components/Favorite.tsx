@@ -26,12 +26,24 @@ export default function Favorite({setMenu}:{
     fetchList()
   },[])
 
-  const fn_delete = async (id: number) => {
-    //await api.delete(`/favorite/${id}`)
-    
+  const fn_toggle = async (favorite: FavoriteItem) => {
+    //
+    if(favorite.pinned) {
+      console.log("delete")
+      
+      await api.delete(`/favorite`,{
+        params : {
+          fullName : favorite.full_name
+        }
+      })
+    } else {
+      console.log("insert")
+      await api.post(`/favorite`, favorite)
+    }
+
     setFavoriteList(prev => 
         prev.map(item => 
-            item.id === id 
+            item.id === favorite.id 
             ? { ...item, pinned: !item.pinned }
             : item
         )
@@ -52,7 +64,7 @@ export default function Favorite({setMenu}:{
                 </div>
                 <div className='section_result_item'>
                     <div className='section_result_faviorate'>
-                        <span style={{cursor:"pointer"}} onClick={()=>fn_delete(v.id)}>{v.pinned ? "★" : "☆"}</span>
+                        <span style={{cursor:"pointer"}} onClick={()=>fn_toggle(v)}>{v.pinned ? "★" : "☆"}</span>
                     </div>
                     <div className='section_result_info'>
                         <span>{`[${v.name}]`}</span>

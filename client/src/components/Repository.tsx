@@ -8,6 +8,7 @@ interface RepoItem {
   html_url: string;
   description: string;
   stargazers_count: number;
+  pinned: boolean;
 }
 
 interface RepoResponse {
@@ -30,17 +31,20 @@ export function Repository({search, setSearch}:{
     setSearch: React.Dispatch<React.SetStateAction<string>>;
 }) {
   
-  const [searchData, setSearchData] = useState(""as string)
+  const [searchData, setSearchData] = useState(search)
   const [searchList, setSearchList] = useState([] as RepoItem[])
   const [isLoading, setIsLoading] = useState(false)
   const [searchLog, setSearchLog] = useState([] as SearchLog[])
 
-  const fn_search = async (search: string) => {
-    setSearchData(search)
+  const fn_search = async (keyword: string) => {
+    setSearchData(keyword)
+    if(search!==keyword) {
+      setSearch(keyword)
+    }
     setIsLoading(true)
     const {data} = await api.get<RepoResponse>("/github/repo", {
       params:{
-        q:search
+        q:keyword
       }
     })
     console.log(data)
@@ -63,16 +67,34 @@ export function Repository({search, setSearch}:{
 
 
   useEffect(()=>{
-    if(search==null || search=="")
-        return;
-
+    if(search == null || search == "") return;
+    //setSearchData(search);
     fn_search(search);
 
-  },[search])
+  },[])
 
-  const fn_favorite = async (item: RepoItem) => {
-    console.log(item)
-    await api.post("/favorite", item)
+  const fn_favorite = async (favorite: RepoItem) => {
+    if(favorite.pinned) {
+      console.log("delete")
+      await api.delete(`/favorite`,{
+        params : {
+          fullName : favorite.full_name
+        }
+      })
+    } else {
+      console.log("insert")
+      await api.post(`/favorite`, favorite)
+    }
+
+    setSearchList(prev => 
+        prev.map(item => 
+            item.full_name === favorite.full_name
+            ? { ...item, pinned: !item.pinned }
+            : item
+        )
+    );
+
+
   }
 
 
@@ -84,7 +106,9 @@ export function Repository({search, setSearch}:{
         </div>
         <div className='board_nav'>
           <div className='board_nav_header'>
-            <input type="text" value={search} onChange={(e)=>setSearch(e.target.value)}/>
+            <input type="text" value={search} 
+              onChange={(e)=>setSearch(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && fn_search(search)}/>
             <button onClick={()=>fn_search(search)}>검색</button>
             <div className='search_logs pinned'>
               {searchLog.filter(v=>v.pinned).map(v=>(
@@ -110,7 +134,7 @@ export function Repository({search, setSearch}:{
                 </div>
                 <div className='section_result_item'>
                     <div className='section_result_faviorate'>
-                        <span style={{cursor:"pointer"}} onClick={()=>fn_favorite(v)}>☆</span>
+                        <span style={{cursor:"pointer"}} onClick={()=>fn_favorite(v)}>{v.pinned?"★":"☆"}</span>
                     </div>
                     <div className='section_result_info'>
                         <span>{`[${v.name}]`}</span>

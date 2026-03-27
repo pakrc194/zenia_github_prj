@@ -6,7 +6,11 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 //GithubRepoResponse.java
 public record GithubRepoResponse(
- @JsonProperty("total_count") int totalCount,
- List<GithubRepoItem> items
-) {}
+	@JsonProperty("total_count") int totalCount,
+ 	List<GithubRepoItem> items
+) {
+	public GithubRepoResponse withItems(List<GithubRepoItem> newItems) {
+        return new GithubRepoResponse(this.totalCount, newItems);
+    }
+}
 

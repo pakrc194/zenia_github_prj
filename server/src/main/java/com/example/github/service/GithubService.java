@@ -1,13 +1,17 @@
 package com.example.github.service;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestClient;
 
+import com.example.github.dto.response.GithubRepoItem;
 import com.example.github.dto.response.GithubRepoResponse;
 import com.example.github.dto.response.SearchLogDto;
+import com.example.github.mapper.FavoriteMapper;
 import com.example.github.mapper.SearchMapper;
 
 @Service
@@ -17,6 +21,8 @@ public class GithubService {
     
     @Autowired
     SearchMapper searchMapper;
+    @Autowired
+    FavoriteMapper favoriteMapper;
 
     public GithubService(@Value("${github.api.url}") String baseUrl,
                          @Value("${github.api.token}") String token) {
@@ -33,13 +39,33 @@ public class GithubService {
     	
     	searchMapper.upsert(query);
     	
-        return restClient.get()
+    	GithubRepoResponse res = restClient.get()
                 .uri(uriBuilder -> uriBuilder
                         .path("/search/repositories")
                         .queryParam("q", query)
                         .build())
                 .retrieve()
                 .body(GithubRepoResponse.class);
+    	
+    	
+    	List<GithubRepoItem> items = res.items().stream().map(item->{
+    		int findCount = favoriteMapper.countByFullName(item.fullName());
+    		
+    		System.out.println("find "+item.fullName()+"("+findCount+")");
+    		
+    		if(findCount > 0) {
+    			return item.withPinned(true);
+    		} else {
+    			return item.withPinned(false);
+    		}
+    	}).toList();
+    	System.out.println(items);
+    	
+    	res = res.withItems(items);
+    	
+    	System.out.println(res);
+    	
+        return res;
     }
     
     public GithubRepoResponse searchUsers(String query) {
