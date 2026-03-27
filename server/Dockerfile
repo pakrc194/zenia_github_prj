@@ -6,10 +6,10 @@ COPY pom.xml .
 RUN mvn dependency:go-offline -B
 
 COPY src ./src
-ARG CACHEBUST=5
-RUN mvn package -DskipTests -e 2>&1 | tail -100
+RUN mvn package -DskipTests
 RUN ls -la target/
 
+# bust: 2025-03-27-003
 FROM eclipse-temurin:17-jre
 WORKDIR /app
 COPY --from=build /app/target/*.jar app.jar
