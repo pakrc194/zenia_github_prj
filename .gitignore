@@ -1,1 +1,15 @@
+# 환경 변수 파일
 .env
+
+# 빌드 결과물
+target/
+build/
+*.jar
+*.war
+
+# 노드 모듈
+node_modules/
+
+# IDE 설정
+.idea/
+.vscode/

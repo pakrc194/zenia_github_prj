@@ -9,6 +9,10 @@ spring:
     username: ${DB_USER}
     url: ${DB_URL}
     password: ${DB_PW}
+  data:
+    redis:
+      host: redis
+      port: 6379
 github:
   api:
     url: https://api.github.com

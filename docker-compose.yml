@@ -1,0 +1,45 @@
+version: '3.8'
+
+services:
+  db:
+      image: mariadb:latest
+      container_name: git-db
+      ports:
+        - "3306:3306"
+      environment:
+        - MARIADB_DATABASE=${DB_NAME}
+        - MARIADB_ROOT_PASSWORD=${DB_ROOT_PASSWORD}
+      volumes:
+      - ./initdb:/docker-entrypoint-initdb.d
+  # 1. Redis: 이미 만들어진 이미지를 가져다 씀
+  redis:
+    image: redis:latest
+    container_name: my-redis
+    ports:
+      - "6379:6379"
+
+  # 2. Backend: 우리가 만든 Dockerfile로 빌드함
+  backend:
+    build: ./server # 실제 백엔드 폴더명으로 수정
+    container_name: my-backend
+    ports:
+      - "8080:8080"
+    depends_on:
+      - redis
+      - db # DB가 켜진 후 실행
+    environment:
+      - SPRING_DATA_REDIS_HOST=redis
+      # .env에 있던 값들을 여기에 직접 적어줍니다.
+      - DB_URL=jdbc:mariadb://db:3306/${DB_NAME}
+      - DB_USER=${DB_USER}
+      - DB_PW=${DB_USER_PASSWORD}
+      - GITHUB_TOKEN=${GITHUB_TOKEN}
+
+  # 3. Frontend: 우리가 만든 Dockerfile로 빌드함
+  frontend:
+    build: ./client # 실제 프론트엔드 폴더명으로 수정
+    container_name: my-frontend
+    ports:
+      - "5173:5173"
+    depends_on:
+      - backend
