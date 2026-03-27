@@ -8,6 +8,9 @@ RUN mvn dependency:go-offline -B
 COPY src ./src
 RUN mvn package -DskipTests
 
+# 빌드된 jar 확인용 (나중에 삭제해도 됨)
+RUN ls -la target/
+
 # 2단계: 실행
 FROM eclipse-temurin:17-jre
 WORKDIR /app
