@@ -9,9 +9,6 @@ services:
       environment:
         - MARIADB_DATABASE=${DB_NAME}
         - MARIADB_ROOT_PASSWORD=${DB_ROOT_PASSWORD}
-      volumes:
-      - ./initdb:/docker-entrypoint-initdb.d
-      - ./mariadb_data:/var/lib/mysql
   # 1. Redis: 이미 만들어진 이미지를 가져다 씀
   redis:
     image: redis:latest
