@@ -47,8 +47,12 @@ public class GithubService {
                         .build())
                 .retrieve()
                 .body(GithubRepoResponse.class);
-    	
-    	
+
+        return res;
+    }
+    
+    
+    public GithubRepoResponse pinnedFilter(GithubRepoResponse res) {
     	List<GithubRepoItem> items = res.items().stream().map(item->{
     		int findCount = favoriteMapper.countByFullName(item.fullName());
     		
@@ -65,9 +69,9 @@ public class GithubService {
     	res = res.withItems(items);
     	
     	System.out.println(res);
-    	
-        return res;
+    	return res;
     }
+    
     
     public GithubRepoResponse searchUsers(String query) {
         return restClient.get()

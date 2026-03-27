@@ -11,6 +11,7 @@ services:
         - MARIADB_ROOT_PASSWORD=${DB_ROOT_PASSWORD}
       volumes:
       - ./initdb:/docker-entrypoint-initdb.d
+      - ./mariadb_data:/var/lib/mysql
   # 1. Redis: 이미 만들어진 이미지를 가져다 씀
   redis:
     image: redis:latest
@@ -32,7 +33,7 @@ services:
       # .env에 있던 값들을 여기에 직접 적어줍니다.
       - DB_URL=jdbc:mariadb://db:3306/${DB_NAME}
       - DB_USER=${DB_USER}
-      - DB_PW=${DB_USER_PASSWORD}
+      - DB_PW=${DB_ROOT_PASSWORD}
       - GITHUB_TOKEN=${GITHUB_TOKEN}
 
   # 3. Frontend: 우리가 만든 Dockerfile로 빌드함

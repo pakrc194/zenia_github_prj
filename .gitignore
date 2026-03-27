@@ -13,3 +13,6 @@ node_modules/
 # IDE 설정
 .idea/
 .vscode/
+
+# db data
+mariadb_data/

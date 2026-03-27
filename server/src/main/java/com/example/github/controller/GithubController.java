@@ -20,7 +20,7 @@ public class GithubController {
 
     @GetMapping("/repo")
     public ResponseEntity<GithubRepoResponse> search(@RequestParam String q) {
-        return ResponseEntity.ok(githubService.searchRepositories(q));
+        return ResponseEntity.ok(githubService.pinnedFilter(githubService.searchRepositories(q)));
     }
     
     @GetMapping("/users")
