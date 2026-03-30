@@ -8,9 +8,19 @@ Github에 있는 Repository를 검색해 볼 수 있는 사이트
 
 ---
 
-### 🔗 배포 링크
+## 🔗 배포 링크
 
 👉 https://client-production-0f21.up.railway.app/
+
+---
+
+
+## 📸 화면 구성
+
+| 검색창 |
+|--------|
+| ![repositories](screenshot/repositories.png) |
+
 
 ---
 
