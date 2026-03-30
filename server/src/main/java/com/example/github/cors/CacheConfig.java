@@ -32,7 +32,8 @@ public class CacheConfig {
                 .allowIfBaseType(Object.class)
                 .build();
 
-        ObjectMapper objectMapper = new ObjectMapper()
+        @SuppressWarnings("deprecation")
+		ObjectMapper objectMapper = new ObjectMapper()
                 .registerModule(new JavaTimeModule())
                 // 핵심: DefaultTyping 설정을 조금 더 명확하게 바꿉니다.
                 .activateDefaultTyping(ptv, ObjectMapper.DefaultTyping.EVERYTHING);
