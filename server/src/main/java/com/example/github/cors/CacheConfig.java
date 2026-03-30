@@ -11,41 +11,40 @@ import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.RedisSerializationContext;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.jsontype.BasicPolymorphicTypeValidator;
 import com.fasterxml.jackson.databind.jsontype.PolymorphicTypeValidator;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 @Configuration
-@EnableCaching // 캐싱 기능 활성화
+@EnableCaching
 public class CacheConfig {
-    @Bean
-    public RedisCacheConfiguration cacheConfiguration() {
-        return RedisCacheConfiguration.defaultCacheConfig()
-            .entryTtl(Duration.ofMinutes(10)) // 10분간 캐시 유지
-            .disableCachingNullValues();
-    }
-    
-    @Bean
-    public RedisCacheManager redisCacheManager(RedisConnectionFactory connectionFactory) {
-        PolymorphicTypeValidator ptv = BasicPolymorphicTypeValidator.builder()
-                .allowIfBaseType(Object.class)
-                .build();
 
-        ObjectMapper objectMapper = new ObjectMapper()
-                .registerModule(new JavaTimeModule())
-                // 핵심: DefaultTyping 설정을 조금 더 명확하게 바꿉니다.
-                .activateDefaultTyping(ptv, ObjectMapper.DefaultTyping.EVERYTHING);
+	@SuppressWarnings("deprecation")
+	@Bean
+	public RedisCacheManager redisCacheManager(RedisConnectionFactory connectionFactory) {
+	    ObjectMapper objectMapper = new ObjectMapper();
+	    objectMapper.registerModule(new JavaTimeModule());
+	    objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+	    objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
-        // GenericJackson2JsonRedisSerializer에 위에서 만든 objectMapper를 주입합니다.
-        GenericJackson2JsonRedisSerializer serializer = new GenericJackson2JsonRedisSerializer(objectMapper);
+	    // record는 final이라 NON_FINAL 대신 EVERYTHING 사용
+	    PolymorphicTypeValidator ptv = BasicPolymorphicTypeValidator.builder()
+	            .allowIfBaseType(Object.class)
+	            .build();
+	    objectMapper.activateDefaultTyping(ptv, ObjectMapper.DefaultTyping.EVERYTHING);
 
-        RedisCacheConfiguration config = RedisCacheConfiguration.defaultCacheConfig()
-                .entryTtl(Duration.ofMinutes(10))
-                .serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer(serializer));
+	    GenericJackson2JsonRedisSerializer serializer = new GenericJackson2JsonRedisSerializer(objectMapper);
 
-        return RedisCacheManager.builder(connectionFactory)
-                .cacheDefaults(config)
-                .build();
-    }
+	    RedisCacheConfiguration config = RedisCacheConfiguration.defaultCacheConfig()
+	            .entryTtl(Duration.ofMinutes(10))
+	            .disableCachingNullValues()
+	            .serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer(serializer));
+
+	    return RedisCacheManager.builder(connectionFactory)
+	            .cacheDefaults(config)
+	            .build();
+	}
 }

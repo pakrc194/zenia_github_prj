@@ -1,5 +1,8 @@
 import { useEffect, useState } from 'react'
 import api from '../lib/axiosInstance.ts'
+import { useVisitorId } from '../lib/useVisitId.ts';
+import { addSearchLog } from './SearchHistory.tsx';
+import { toggleFavorite } from './Favorite.tsx';
 
 interface RepoItem {
   id: number;
@@ -25,7 +28,6 @@ interface SearchLog {
 
 
 
-
 export function Repository({search, setSearch}:{
     search: string;
     setSearch: React.Dispatch<React.SetStateAction<string>>;
@@ -35,6 +37,8 @@ export function Repository({search, setSearch}:{
   const [searchList, setSearchList] = useState([] as RepoItem[])
   const [isLoading, setIsLoading] = useState(false)
   const [searchLog, setSearchLog] = useState([] as SearchLog[])
+  const visitorId = useVisitorId();
+
 
   const fn_search = async (keyword: string) => {
     setSearchData(keyword)
@@ -42,7 +46,11 @@ export function Repository({search, setSearch}:{
       setSearch(keyword)
     }
     setIsLoading(true)
-    const {data} = await api.get<RepoResponse>("/github/repo", {
+    const {data} = await api.post<RepoResponse>("/github/repo", 
+      {
+        visitorId: visitorId
+      },
+      {
       params:{
         q:keyword
       }
@@ -50,6 +58,8 @@ export function Repository({search, setSearch}:{
     console.log(data)
     setSearchList(data.items)
     setIsLoading(false)
+    
+    addSearchLog(visitorId, keyword)
   }
 
   useEffect(()=>{
@@ -74,6 +84,8 @@ export function Repository({search, setSearch}:{
   },[])
 
   const fn_favorite = async (favorite: RepoItem) => {
+    if (!visitorId) return
+
     if(favorite.pinned) {
       console.log("delete")
       await api.delete(`/favorite`,{
@@ -85,6 +97,15 @@ export function Repository({search, setSearch}:{
       console.log("insert")
       await api.post(`/favorite`, favorite)
     }
+
+    // localStorage에 저장/삭제
+    toggleFavorite(visitorId, {
+      id: favorite.id,
+      name: favorite.name,
+      full_name: favorite.full_name,
+      html_url: favorite.html_url,
+      description: favorite.description,
+    })
 
     setSearchList(prev => 
         prev.map(item => 
