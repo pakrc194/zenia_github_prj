@@ -2,17 +2,13 @@ version: '3.8'
 
 services:
   db:
-      image: mysql:latest
+      image: mariadb:latest
       container_name: git-db
       ports:
         - "3306:3306"
       environment:
-        - MYSQL_DATABASE=${DB_NAME}
-        - MYSQL_ROOT_PASSWORD=${DB_ROOT_PASSWORD}
-      volumes:
-      - ./initdb:/docker-entrypoint-initdb.d
-      - ./mysql_data:/var/lib/mysql
-
+        - MARIADB_DATABASE=${DB_NAME}
+        - MARIADB_ROOT_PASSWORD=${DB_ROOT_PASSWORD}
   # 1. Redis: 이미 만들어진 이미지를 가져다 씀
   redis:
     image: redis:latest
@@ -32,7 +28,7 @@ services:
     environment:
       - SPRING_DATA_REDIS_HOST=redis
       # .env에 있던 값들을 여기에 직접 적어줍니다.
-      - DB_URL=jdbc:mysql://db:3306/${DB_NAME}
+      - DB_URL=jdbc:mariadb://db:3306/${DB_NAME}
       - DB_USER=${DB_USER}
       - DB_PW=${DB_ROOT_PASSWORD}
       - GITHUB_TOKEN=${GITHUB_TOKEN}

@@ -7,25 +7,25 @@
     <select id="findByLimit" resultType="com.example.github.dto.response.SearchLogDto" parameterType="int">
         (select * from search where pinned = 1)
 		union all
-		(select * from search where pinned = 0 order by updated_at desc  
+		(select * from search where pinned = 0 order by created_at desc  
 		<if test='limit != 0'> 
         limit #{limit}
         </if>)
 		order by
 		    pinned desc,
 		    case 
-		        when pinned = 1 then updated_at 
+		        when pinned = 1 then created_at 
 		    end desc,
 		    case 
-		        when pinned = 0 then updated_at
+		        when pinned = 0 then created_at
 		    end desc;
     </select>
 
-    <insert id="upsert" parameterType="com.example.github.dto.response.SearchRequest">
-        insert into search(visitor_id, name, updated_at, created_at)
-        values (#{visitorId}, #{name}, now(), now())
+    <insert id="upsert" parameterType="String">
+        insert into search(name, created_at)
+        values (#{name}, now())
         ON DUPLICATE KEY UPDATE
-        updated_at = NOW(), count = count+1
+        created_at = NOW()
     </insert>
     
     <delete id="delete" parameterType="Long">

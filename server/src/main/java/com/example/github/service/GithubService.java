@@ -11,7 +11,6 @@ import org.springframework.web.client.RestClient;
 
 import com.example.github.dto.response.GithubRepoItem;
 import com.example.github.dto.response.GithubRepoResponse;
-import com.example.github.dto.response.SearchRequest;
 import com.example.github.mapper.FavoriteMapper;
 import com.example.github.mapper.SearchMapper;
 
@@ -36,14 +35,15 @@ public class GithubService {
     }
     
     @Transactional
-    @Cacheable(value = "github_search", key = "#req.name", cacheManager = "redisCacheManager")
-    public GithubRepoResponse searchRepositories(SearchRequest req) {
-    	searchMapper.upsert(req);
+    @Cacheable(value = "github_search", key = "#query", cacheManager = "redisCacheManager")
+    public GithubRepoResponse searchRepositories(String query) {
+    	
+    	searchMapper.upsert(query);
     	
     	GithubRepoResponse res = restClient.get()
                 .uri(uriBuilder -> uriBuilder
                         .path("/search/repositories")
-                        .queryParam("q", req.name())
+                        .queryParam("q", query)
                         .build())
                 .retrieve()
                 .body(GithubRepoResponse.class);
@@ -64,7 +64,7 @@ public class GithubService {
     			return item.withPinned(false);
     		}
     	}).toList();
-    	//System.out.println(items);
+    	System.out.println(items);
     	
     	res = res.withItems(items);
     	

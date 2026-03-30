@@ -16,4 +16,3 @@ node_modules/
 
 # db data
 mariadb_data/
-mysql_data/
